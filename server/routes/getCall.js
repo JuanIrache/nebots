@@ -5,8 +5,9 @@ const { VoiceResponse } = require('twilio').twiml;
 const Provider = require('../models/Provider');
 const Call = require('../models/Call');
 const getDate = require('../modules/getDate');
+const generateKey = require('../modules/generateKey');
 
-const { NEBOTS_TWACCOUNTSID, NEBOTS_TWAUTHTOKEN } = process.env;
+const { NEBOTS_TWACCOUNTSID, NEBOTS_TWAUTHTOKEN, NEBOTS_TWPROXY } = process.env;
 
 const tw = require('twilio')(NEBOTS_TWACCOUNTSID, NEBOTS_TWAUTHTOKEN);
 
@@ -32,14 +33,36 @@ module.exports = async (req, res) => {
       return res.status(400).send('<h1>Alguna cosa ha anat malament</h1>');
     }
 
+    console.log('proxy', NEBOTS_TWPROXY);
+
+    const session = await tw.proxy
+      .services(NEBOTS_TWPROXY)
+      .sessions.create({ uniqueName: generateKey(10) });
+
+    console.log('got session');
+    const { proxyIdentifier } = await tw.proxy
+      .services(NEBOTS_TWPROXY)
+      .sessions(session.sid)
+      .participants.create({
+        friendlyName: 'Client',
+        identifier: call.from
+      });
+
+    console.log('got user', proxyIdentifier);
+
+    await tw.proxy
+      .services(NEBOTS_TWPROXY)
+      .sessions(session.sid)
+      .participants.create({
+        friendlyName: 'Provider',
+        identifier: provider.phone
+      });
+
+    console.log('got user 2');
     const response = new VoiceResponse();
-
-    response.dial(provider.phone);
-
+    response.dial(proxyIdentifier);
     tw.calls(call.callSid).update({ twiml: response.toString() });
-
     Call.deleteOne({ _id: req.params.id }, () => {});
-
     console.log(`${getDate()} - Establishing call`);
 
     return res

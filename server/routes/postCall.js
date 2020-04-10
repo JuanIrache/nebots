@@ -28,11 +28,12 @@ module.exports = async (req, res) => {
 
     // CallSid is the call identifier on Twilio's end
     const callSid = req.body.CallSid;
+    const from = req.body.From;
 
     // Delete if already existing
     await Call.deleteOne({ callSid }).exec();
 
-    await Call.create({ _id, callSid });
+    await Call.create({ _id, callSid, from });
 
     // Send sms to providers
 
