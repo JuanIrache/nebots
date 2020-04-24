@@ -4,6 +4,7 @@ const Provider = require('../models/Provider');
 
 const generateKey = require('../modules/generateKey');
 const getDate = require('../modules/getDate');
+const formatPhone = require('../modules/formatPhone');
 
 require('dotenv').config();
 
@@ -27,9 +28,7 @@ module.exports = async (req, res) => {
       }
 
       // Add Spanish prefix if missing
-      if (phone.slice(0, 3) != '+34' && phone.slice(0, 4) != '0034') {
-        phone = '+34' + phone;
-      }
+      phone = formatPhone(phone);
 
       // Delete if already existing
       await Provider.deleteOne({ phone }).exec();
