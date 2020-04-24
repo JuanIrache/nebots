@@ -9,7 +9,7 @@ require('dotenv').config();
 const {
   NEBOTS_TWACCOUNTSID,
   NEBOTS_TWAUTHTOKEN,
-  NEBOTS_TWFROM,
+  NEBOTS_TWSMS,
   NEBOTS_SERVER
 } = process.env;
 
@@ -32,7 +32,7 @@ module.exports = async (req, res) => {
 
       // console.log(body);
 
-      tw.messages.create({ body, from: NEBOTS_TWFROM, to: phone });
+      tw.messages.create({ body, from: NEBOTS_TWSMS, to: phone });
       console.log(`${getDate()} - Delete provider request`);
       return res.sendStatus(200);
     } catch (error) {

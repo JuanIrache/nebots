@@ -12,7 +12,7 @@ require('dotenv').config();
 const {
   NEBOTS_TWACCOUNTSID,
   NEBOTS_TWAUTHTOKEN,
-  NEBOTS_TWFROM,
+  NEBOTS_TWSMS,
   NEBOTS_SERVER
 } = process.env;
 
@@ -49,7 +49,7 @@ module.exports = async (req, res) => {
       );
 
       // console.log(body);
-      tw.messages.create({ body, from: NEBOTS_TWFROM, to: provider.phone });
+      tw.messages.create({ body, from: NEBOTS_TWSMS, to: provider.phone });
     }
 
     // Prepare response for Twilio
